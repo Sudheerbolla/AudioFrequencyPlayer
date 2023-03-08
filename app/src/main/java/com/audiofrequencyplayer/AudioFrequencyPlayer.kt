@@ -86,7 +86,8 @@ class AudioFrequencyPlayer : Runnable {
 
         buffer = ShortArray(bufferSize)
 
-        //        We are using sine wave only here.
+        //        We are using sine wave only here. There are some other as well. But for the sake of simplicity,
+//        we are using only one. We can add condition and maintain all if needed.
         var f = frequency.toDouble()
         var l = 0.0
         var q = 0.0
