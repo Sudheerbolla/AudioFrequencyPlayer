@@ -43,5 +43,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
+    override fun onStop() {
+        super.onStop()
+        audioFrequencyPlayer.stop()
+    }
 }
