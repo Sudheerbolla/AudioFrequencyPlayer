@@ -14,7 +14,7 @@
         android:hint="@string/enter_frequency_between_0_and_24000"
         android:inputType="number"
         android:padding="10dp"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
