@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">AudioFrequencyPlayer</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="enter_frequency_between_0_and_24000">Enter frequency between 0 and 24000</string>
+</resources>
