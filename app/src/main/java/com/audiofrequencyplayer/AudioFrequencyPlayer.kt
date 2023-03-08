@@ -4,10 +4,14 @@ import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
+import android.os.Handler
+import android.os.Looper
+import com.audiofrequencyplayer.utils.SOUND_DURATION
 import kotlin.math.roundToLong
 import kotlin.math.sin
 
-class AudioPlayer : Runnable {
+class AudioFrequencyPlayer : Runnable {
+
     var frequency = 0
     protected var level = 16384.0
     protected var thread: Thread? = null
@@ -16,6 +20,18 @@ class AudioPlayer : Runnable {
     fun start() {
         thread = Thread(this, "AudioPlayer")
         thread!!.start()
+//      Using this to prevent the sound overlapping from noise completely. Its temporary fix
+        setVolume(0f)
+        Thread.sleep(750)
+        setVolume(1f)
+//      Using this because we need to stop the sound after specific time. or play for that duration
+        Handler(Looper.getMainLooper()).postDelayed({
+            stop()
+        }, SOUND_DURATION)
+    }
+
+    fun setVolume(vol: Float) {
+        audioTrack?.setVolume(vol)
     }
 
 //        fun startForTime(longMS: Long) {
@@ -43,18 +59,8 @@ class AudioPlayer : Runnable {
         val buffer: ShortArray
         val rate = AudioTrack.getNativeOutputSampleRate(AudioManager.STREAM_MUSIC)
         val bufferSize = 512
-        val K = 2.0 * Math.PI / rate
-        // Create the audio track
-//        audioTrack = AudioTrack(
-//            AudioManager.STREAM_MUSIC,
-//            rate,
-////                AudioFormat.CHANNEL_OUT_STEREO,
-//            AudioFormat.CHANNEL_OUT_MONO,
-//            AudioFormat.ENCODING_PCM_16BIT,
-//            bufferSize,
-//            AudioTrack.MODE_STREAM
-//        )
-
+        val sineWave = 2.0 * Math.PI / rate
+//creating audio track to play a sound with our calculated buffer using frequency.
         audioTrack = AudioTrack.Builder()
             .setAudioAttributes(
                 AudioAttributes.Builder()
@@ -76,18 +82,20 @@ class AudioPlayer : Runnable {
             audioTrack!!.release()
             return
         }
-        audioTrack!!.play()
+//        audioTrack!!.play()
 
         buffer = ShortArray(bufferSize)
 
+        //        We are using sine wave only here.
         var f = frequency.toDouble()
         var l = 0.0
         var q = 0.0
         while (thread != null) {
+            audioTrack!!.play()
             for (i in buffer.indices) {
                 f += (frequency - f) / 4096.0
                 l += (level * 16384.0 - l) / 4096.0
-                q += if (q + f * K < Math.PI) f * K else f * K - 2.0 * Math.PI
+                q += if (q + f * sineWave < Math.PI) f * sineWave else f * sineWave - 2.0 * Math.PI
                 buffer[i] = (sin(q) * l).roundToLong().toShort()
             }
             audioTrack!!.write(buffer, 0, buffer.size)
